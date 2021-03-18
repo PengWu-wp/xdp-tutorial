@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 	int prog_fd, err;
 
 	struct config cfg = {
-		.xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST | XDP_FLAGS_DRV_MODE,
+		.xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST | XDP_FLAGS_SKB_MODE,
 		.ifindex   = -1,
 		.do_unload = false,
 	};
