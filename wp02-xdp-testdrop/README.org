@@ -1,0 +1,12 @@
+# -*- fill-column: 76; -*-
+#+TITLE: Tutorial: wp02-xdp-testdrop
+#+OPTIONS: ^:nil
+
+This test uses intel x550T NIC which support XDP_DRV_MODE.
+Two ports are used:
+  - Port0 is bound by DPDK, using Pktgen to send packets.
+  - Port1 attach my XDP porg of a simple firewall (only drop by IP).
+Pktgen tool can be found in [[https://github.com/sdnfv/openNetVM/tree/master/tools/Pktgen][here]].
+I have no idea which tool can show how many pkts are droped by my XDP prog. So I count in my XDP prog and save it to my map (key = 1).
+Map ID needs to be changed before you run it.
+It's a long way to go.
