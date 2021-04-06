@@ -22,5 +22,5 @@ clean:
 	rm -f *.o map *.ll map_manage xdp_drbymap_user
 
 map: map
-	clang -o map_manage $(LOADINCLUDE) -lbpf map_manage.c
+	clang -o map_manage $(LOADINCLUDE) -lbpf -elf map_manage.c
 
