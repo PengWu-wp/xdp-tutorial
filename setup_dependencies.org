@@ -40,7 +40,7 @@ git submodule update --init
 If you want submodules to be part of the clone, you can use this command:
 
 #+begin_example
-git clone --recurse-submodules https://github.com/xdp-project/xdp-tutorial
+git clone --recurse-submodules https://github.com/PengWu-wp/xdp-tutorial.git
 #+end_example
 
 If you need to add this to your own project, you can use the command:
