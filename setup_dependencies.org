@@ -60,6 +60,12 @@ track the kernel behaviour through tracepoints.
 The Makefiles in this repo will try to detect if you are missing some
 dependencies, and give you some pointers.
 
+** Just do this on Ubuntu:
+
+#+begin_example
+ $ sudo apt install clang llvm libelf-dev libpcap-dev gcc-multilib build-essential linux-tools-$(uname -r) linux-headers-$(uname -r)
+#+end_example
+
 ** Packages on Fedora
 
 On a machine running the Fedora Linux distribution, install the packages:
