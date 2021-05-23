@@ -66,19 +66,8 @@ int bmc_rx_filter_main(struct xdp_md *ctx)
 			return XDP_PASS;
 	}
 	if(payload + 23 <= data_end){
-		//bpfprint("payload[0] is %x,payload[1] is %x\n",payload[0],payload[1]);
-		//bpfprint("payload[2] is %x,payload[3] is %x\n",payload[2],payload[3]);
-		//bpfprint("payload[4] is %x,payload[5] is %x\n",payload[4],payload[5]);
-		//bpfprint("payload[6] is %x,payload[7] is %x\n",payload[6],payload[7]);
-		//bpfprint("payload[8] is %x,payload[9] is %x\n",payload[8],payload[9]);
-		//bpfprint("payload[10] is %x,payload[11] is %x\n",payload[10],payload[11]);
-		//bpfprint("payload[19] is %x,payload[20] is %x\n",payload[19],payload[20]);
-		/*bpfprint("%x\n",payload[20]);
-		bpfprint("%x\n",payload[21]);
-		bpfprint("%x\n",payload[22]);*/
-		//bpfprint("xrc_tcp_hdr->tsv is %x\n",xrc_tcp_hdr->tsv);
-		//bpfprint("data[0] is %x\n",xrc_tcp_hdr->data[0]);
-		if(payload[20]=='g'&&payload[21]=='e'&&payload[22]=='t'){ // This is a GET request
+		if ((payload[20] == 'g' || payload[20] == 'G') && (payload[21] == 'e' || payload[21] == 'E') &&
+            (payload[22] == 't' || payload[22] == 'T')){ // This is a GET request
 			//bpfprint("This is a redis get!\n");
 			// //
 			unsigned int mid;
