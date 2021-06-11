@@ -8,7 +8,7 @@ Two ports are used:
   - Port1 attach my XDP porg of a simple firewall (only drop by IP).
 Pktgen tool can be found in [[https://github.com/sdnfv/openNetVM/tree/master/tools/Pktgen][here]].
 
-I have no idea which tool can show how many pkts are droped by my XDP prog. So I count in my XDP prog and save it to my map (key = 1).
+I have no idea which tool can show how many pkts are droped by my XDP prog. So I count in my XDP prog and save it to my map (key = 0).
 
 Map ID needs to be changed before you run it.
 
