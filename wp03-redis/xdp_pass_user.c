@@ -9,6 +9,8 @@ static const char *__doc__ = "Simple XDP prog doing XDP_PASS\n";
 
 #include <bpf/bpf.h>
 #include <bpf/libbpf.h>
+#include <unistd.h> 
+#include <arpa/inet.h>
 
 #include <net/if.h>
 #include <linux/if_link.h> /* depend on kernel-headers installed */
@@ -125,6 +127,8 @@ int xdp_link_attach(int ifindex, __u32 xdp_flags, int prog_fd)
 
 int main(int argc, char **argv)
 {
+
+struct bpf_object *obj;
 	struct bpf_prog_info info = {};
 	__u32 info_len = sizeof(info);
 	char filename[256] = "xdp_pass_kern.o";
@@ -146,9 +150,8 @@ int main(int argc, char **argv)
 	if (cfg.do_unload)
 		return xdp_link_detach(cfg.ifindex, cfg.xdp_flags);
 
-	/* Load the BPF-ELF object file and get back first BPF_prog FD */
-	prog_fd = load_bpf_object_file__simple(filename);
-	if (prog_fd <= 0) {
+	err = bpf_prog_load(filename, BPF_PROG_TYPE_XDP, &obj, &prog_fd);
+	if (err) {
 		fprintf(stderr, "ERR: loading file: %s\n", filename);
 		return EXIT_FAIL_BPF;
 	}
@@ -173,5 +176,20 @@ int main(int argc, char **argv)
 	printf("Success: Loading "
 	       "XDP prog name:%s(id:%d) on device:%s(ifindex:%d)\n",
 	       info.name, info.id, cfg.ifname, cfg.ifindex);
+
+int map_fd =-1;
+        map_fd= bpf_object__find_map_fd_by_name(obj,"cnt_map");
+	if(map_fd < 0)printf("map_fd not found!\n");
+        else printf("map_fd is %d\n",map_fd);
+
+	unsigned int key = 0;
+	unsigned int value;
+	unsigned int value_last;
+	while(true){
+		err = bpf_map_lookup_elem(map_fd, &key, &value);
+		printf("TX\t%d\tReqs/s\n", value - value_last);
+		value_last = value;
+		sleep(1);	
+	}
 	return EXIT_OK;
 }
