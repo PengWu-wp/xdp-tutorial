@@ -50,18 +50,16 @@ struct tcp_header_option { // seems like this is fixed struct?
 
 
 struct bpf_map_def SEC("maps")
-blacklist_map = {
-        .type        = BPF_MAP_TYPE_ARRAY,
+test_map = {
+        .type        = BPF_MAP_TYPE_HASH,
         .key_size    = sizeof(unsigned int),
         .value_size  = sizeof(unsigned int),
-        .max_entries = 100,
+        .max_entries = 10000,
 };
 
 static inline __u16 compute_ip_checksum(struct iphdr *ip) {
     u32 csum = 0;
     u16 *next_ip_u16 = (u16 *) ip;
-
-
     ip->check = 0;
 
 #pragma clang loop unroll(full)
@@ -124,9 +122,8 @@ int bmc_rx_filter_main(struct xdp_md *ctx) {
 
     be32 tmp_tsv;
 
-    unsigned int key = 0;
+    unsigned int key;
     unsigned int *value;
-    value = bpf_map_lookup_elem(&blacklist_map, &key);
 
     if (ip + 1 > data_end)
         return XDP_PASS;
@@ -188,17 +185,33 @@ int bmc_rx_filter_main(struct xdp_md *ctx) {
             payload[9] = 0x0d;
             payload[10] = 0x0a; // static for now...
             tcp->check = 0;
-            if(payload_len % 2 != 0 && payload + payload_len + 1 <= data_end){
+            if(payload + payload_len + 1 <= data_end){
                 tcp->check = compute_tcp_checksum(ip, tcp, tcphdr_ops, payload, payload_len);
-            }else{
-                return XDP_PASS;
+            }else {
+                return XDP_DROP;
             }
+            key = tcp->ack_seq;
+            tmp_tsv = 11;
+            bpf_map_update_elem(&test_map, &key, &tmp_tsv, BPF_ANY);
+
             bpf_xdp_adjust_tail(ctx, -(ip_totlen_old - 52 - payload_len));
+
+
             return XDP_TX;
-        } else {
+        } else { // Not a GET
             return XDP_PASS;
         }
+    }// end if (payload + 11 <= data_end)
+
+    key = tcp->seq;
+    value = bpf_map_lookup_elem(&test_map, &key);
+
+    if(value){
+        bpf_map_delete_elem(&test_map, &key);
+        return XDP_DROP;
     }
+
+
     return XDP_PASS;
 }
 
