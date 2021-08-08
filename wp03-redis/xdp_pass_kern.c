@@ -57,6 +57,14 @@ test_map = {
         .max_entries = 10000,
 };
 
+struct bpf_map_def SEC("maps")
+cnt_map = {
+        .type        = BPF_MAP_TYPE_HASH,
+        .key_size    = sizeof(unsigned int),
+        .value_size  = sizeof(unsigned int),
+        .max_entries = 10,
+};
+
 static inline __u16 compute_ip_checksum(struct iphdr *ip) {
     u32 csum = 0;
     u16 *next_ip_u16 = (u16 *) ip;
@@ -195,6 +203,18 @@ int bmc_rx_filter_main(struct xdp_md *ctx) {
             bpf_map_update_elem(&test_map, &key, &tmp_tsv, BPF_ANY);
 
             bpf_xdp_adjust_tail(ctx, -(ip_totlen_old - 52 - payload_len));
+
+	    key = 0;
+	    unsigned int *cnt;
+	    unsigned int cntnum = 1;
+	    cnt = bpf_map_lookup_elem(&cnt_map, &key);
+	    if (cnt) {
+	        cntnum = *cnt;
+	        cntnum++;
+		bpf_map_update_elem(&cnt_map, &key, &cntnum, BPF_ANY);
+	    } else {
+		bpf_map_update_elem(&cnt_map, &key, &cntnum, BPF_ANY);
+	    }
 
 
             return XDP_TX;
