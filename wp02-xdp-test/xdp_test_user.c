@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 	unsigned int value_last;
 	while(true){
 		err = bpf_map_lookup_elem(map_fd, &key, &value);
-		printf("TX: %d pkts/s\n", value - value_last);
+		printf("W:XDP_PASS\t%d\tpkts/s\n", value - value_last);
 		value_last = value;
 		sleep(1);	
 	}

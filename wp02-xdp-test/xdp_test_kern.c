@@ -36,7 +36,7 @@ int xdp_test(struct xdp_md *ctx) {
     } else {
         bpf_map_update_elem(&cnt_map, &key, &cntnum, BPF_ANY);
     }
-    return XDP_DROP;
+    return XDP_PASS;
 }
 
 char _license[] SEC("license") = "GPL";
