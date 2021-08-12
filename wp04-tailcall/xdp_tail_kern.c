@@ -13,7 +13,7 @@ xdp_progs_map = {
 SEC("xdp")
 int  xdp_main(struct xdp_md *ctx)
 {
-    bpf_tail_call(ctx, &jmp_table, index);
+    bpf_tail_call(ctx, &jmp_table, 1);
     return XDP_DROP;
 }
 
