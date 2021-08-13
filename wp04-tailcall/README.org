@@ -1,0 +1,16 @@
+# -*- fill-column: 76; -*-
+#+TITLE: Tutorial: wp04 - using bpf_tail_call
+#+OPTIONS: ^:nil
+
+First note: once the loader (xdp_tail_user) is ended, the xdp_progs_map will be cleared. I just don't know why... 
+And this disturb me a lot. Anyway, I add a while(1) loop in xdp_tail_user.c and it worked.
+
+To use the helper "long bpf_tail_call(void *ctx, struct bpf_map *prog_array_map, u32 index)", you gonna need:
+
+A BPF_MAP_TYPE_PROG_ARRAY type map;
+
+Update the map using eBPF progs fd (each sec's fd) and the specified index;
+
+(And do not quit your loader...But why?)
+
+I will update this program later...
