@@ -18,6 +18,21 @@ static const char *__doc__ = "XDP loader\n"
 #include "../common/common_params.h"
 #include "../common/common_user_bpf_xdp.h"
 
+///////////////////////////////////////////////////////////////////
+struct bpf_progs_desc {
+    char name[256];
+    enum bpf_prog_type type;
+    unsigned char pin;
+    int map_prog_idx;
+    struct bpf_program *prog;
+};
+
+static struct bpf_progs_desc progs[] = {
+        {"xdp", BPF_PROG_TYPE_XDP, 0, -1, NULL},
+        {"xdp_2", BPF_PROG_TYPE_XDP, 0, 0, NULL},
+};
+///////////////////////////////////////////////////////////////////
+
 static const char *default_filename = "xdp_tail_kern.o";
 static const char *default_progsec = "xdp";
 
@@ -178,7 +193,7 @@ int main(int argc, char **argv)
     }
     if (cfg.do_unload)
         return xdp_link_detach(cfg.ifindex, cfg.xdp_flags, 0);
-
+/*
     bpf_obj = __load_bpf_and_xdp_attach(&cfg);
 
     if (!bpf_obj)
@@ -192,9 +207,98 @@ int main(int argc, char **argv)
         printf("xdp_progs_map_fd found %d\n", xdp_progs_map_fd);
     }
 
+    //int map_prog_idx = 0;
+*/
 
 
+///////////////////////////////////////////////////////////////////////////////// open obj to get bpf_obj
+    bpf_obj = bpf_object__open(default_filename);
+    if (!bpf_obj) {
+        fprintf(stderr, "Error: bpf_object__open failed\n");
+        return 1;
+    } else {
+        printf("WP: %s opened, and bpf_obj get!\n",default_filename);
+    }
+///////////////////////////////////////////////////////////////////////////////// load struch bpf_program(progs.prog) by bpf_obj and sec name
+    int prog_count;
+    prog_count = sizeof(progs) / sizeof(progs[0]);
 
+    for (int i = 0; i < prog_count; i++) {
+        progs[i].prog = bpf_object__find_program_by_title(bpf_obj, progs[i].name);
+        if (!progs[i].prog) {
+            fprintf(stderr, "Error: bpf_object__find_program_by_title failed\n");
+            return 1;
+        } else {
+            printf("WP: prog sec %s found and got struct bpf_program!\n",progs[i].name);
+        }
+        bpf_program__set_type(progs[i].prog, progs[i].type);
+    }
+///////////////////////////////////////////////////////////////////////////////// load bpf_obj into the kernel
+    int err;
+    struct bpf_object_load_attr load_attr;
+
+    load_attr.obj = bpf_obj;
+    load_attr.log_level = LIBBPF_WARN;
+
+    err = bpf_object__load_xattr(&load_attr);
+    if (err) {
+        fprintf(stderr, "Error: bpf_object__load_xattr failed\n");
+        return 1;
+    } else {
+        printf("WP: bpf_obj loaded into kernel!\n");
+    }
+///////////////////////////////////////////////////////////////////////////////// get prog_map's fd by its name and bpf_obj
+    int xdp_progs_map_fd = bpf_object__find_map_fd_by_name(bpf_obj, "xdp_progs_map");
+    if (xdp_progs_map_fd < 0) {
+        fprintf(stderr, "Error: bpf_object__find_map_fd_by_name failed\n");
+        return 1;
+    } else {
+        printf("xdp_progs_map_fd found %d\n", xdp_progs_map_fd);
+    }
+///////////////////////////////////////////////////////////////////////////////// get each sec's prog fd, and update xdp_progs_map
+    for (int i = 0; i < prog_count; i++) {
+        int prog_fd = bpf_program__fd(progs[i].prog); // each sec's prog fd
+
+        if (prog_fd < 0) {
+            fprintf(stderr, "Error: Couldn't get file descriptor for program %s\n", progs[i].name);
+            return 1;
+        } else {
+            printf("%s 's prog fd got: %d\n",progs[i].name, prog_fd);
+        }
+
+        if (progs[i].map_prog_idx != -1) {
+            unsigned int map_prog_idx = progs[i].map_prog_idx;
+            if (map_prog_idx < 0) {
+                fprintf(stderr, "Error: Cannot get prog fd for bpf program %s\n", progs[i].name);
+                return 1;
+            }
+
+            err = bpf_map_update_elem(xdp_progs_map_fd, &map_prog_idx, &prog_fd, 0);
+            if (err) {
+                fprintf(stderr, "Error: bpf_map_update_elem failed for prog array map\n");
+                return 1;
+            } else {
+                printf("xdp_progs_map updated! name: %s, idx: %d, fd: %d\n",progs[i].name,map_prog_idx,prog_fd);
+            }
+        }
+    }
+
+    //__u32 xdp_flags |= XDP_FLAGS_SKB_MODE;
+    int xdp_main_prog_fd = bpf_program__fd(progs[0].prog);
+    if (xdp_main_prog_fd < 0) {
+        fprintf(stderr, "Error: bpf_program__fd failed\n");
+        return 1;
+    }
+    if (bpf_set_link_xdp_fd(cfg.ifindex, xdp_main_prog_fd, XDP_FLAGS_SKB_MODE) < 0) {
+        fprintf(stderr, "Error: bpf_set_link_xdp_fd failed for interface %d\n", cfg.ifindex);
+        return 1;
+    } else {
+        printf("Main BPF program attached to XDP on interface %d\n", cfg.ifindex);
+    }
+
+    while(1){
+        
+    }
 
     if (verbose)
         list_avail_progs(bpf_obj);
