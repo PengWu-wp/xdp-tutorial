@@ -4,12 +4,20 @@
 #+TITLE: XDP Hands-On Tutorial
 #+OPTIONS: ^:nil
 
-# WP's note:
+** WP's note:
 
 Dependencies on Ubuntu:
-`$ sudo apt install clang llvm libelf-dev libpcap-dev gcc-multilib build-essential linux-tools-$(uname -r) linux-headers-$(uname -r)`
+
+#+begin_example
+$ sudo apt install clang llvm libelf-dev libpcap-dev gcc-multilib build-essential \
+           linux-tools-$(uname -r) linux-headers-$(uname -r)
+#+end_example
+
 Don't forget libbpf as git-submodule:
-`git submodule update --init`
+
+#+begin_example
+$ git submodule update --init
+#+end_example
 
 
 This repository contains a tutorial that aims to introduce you to the basic
