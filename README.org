@@ -1,3 +1,10 @@
+# WP's note:
+
+Dependencies on Ubuntu:
+`$ sudo apt install clang llvm libelf-dev libpcap-dev gcc-multilib build-essential linux-tools-$(uname -r) linux-headers-$(uname -r)`
+Don't forget libbpf as git-submodule:
+`git submodule update --init`
+
 # -*- fill-column: 76; -*-
 #+TITLE: XDP Hands-On Tutorial
 #+OPTIONS: ^:nil
