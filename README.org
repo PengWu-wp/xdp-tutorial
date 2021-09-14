@@ -1,3 +1,9 @@
+
+
+# -*- fill-column: 76; -*-
+#+TITLE: XDP Hands-On Tutorial
+#+OPTIONS: ^:nil
+
 # WP's note:
 
 Dependencies on Ubuntu:
@@ -5,9 +11,6 @@ Dependencies on Ubuntu:
 Don't forget libbpf as git-submodule:
 `git submodule update --init`
 
-# -*- fill-column: 76; -*-
-#+TITLE: XDP Hands-On Tutorial
-#+OPTIONS: ^:nil
 
 This repository contains a tutorial that aims to introduce you to the basic
 steps needed to effectively write programs for the eXpress Data Path (XDP)
