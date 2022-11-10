@@ -2,7 +2,7 @@
 #+TITLE: Setup dependencies
 #+OPTIONS: ^:nil
 
-Before you can start completing the steps in this XDP-tutorial, go though
+Before you can start completing the steps in this XDP-tutorial, go through
 this document and install the needed software packages.
 
 * Table of Contents                                                     :TOC:
@@ -161,12 +161,16 @@ your system. It also offers simple manipulation of eBPF programs and maps.
 The =bpftool= is part of the Linux kernel tree under [[https://github.com/torvalds/linux/tree/master/tools/bpf/bpftool][tools/bpf/bpftool/]], but
 some Linux distributions also ship the tool as a software package.
 
+If you are planning on working through the packet processing examples you
+should also install tcpdump.
+
 ** Packages on Fedora
 
 On a machine running the Fedora Linux distribution, install package:
 
 #+begin_example
  $ sudo dnf install bpftool
+ $ sudo dnf install tcpdump
 #+end_example
 
 ** Packages on Ubuntu
@@ -175,6 +179,7 @@ Starting from Ubuntu 19.10, bpftool can be installed with:
 
 #+begin_example
  $ sudo apt install linux-tools-common linux-tools-generic
+ $ sudo apt install tcpdump
 #+end_example
 
 (Ubuntu 18.04 LTS also has it, but it is an old and quite limited bpftool
@@ -182,14 +187,14 @@ version.)
 
 ** Packages on Debian
 
-Unfortunately, bpftool is not officially packaged for Debian
-[[https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=896165)][yet]].
+Starting from Debian Bullseye, bpftool can be installed with:
 
-However, note that an unofficial
-[[https://help.netronome.com/helpdesk/attachments/36025601060][.deb package]]
-is provided by Netronome
-[[https://help.netronome.com/support/solutions/articles/36000050009-agilio-ebpf-2-0-6-extended-berkeley-packet-filter][on their support website]].
-The binary is statically linked, and should work on any x86-64 Linux machine.
+#+begin_example
+ $ sudo apt install bpftool
+ $ sudo apt install tcpdump
+#+end_example
+
+(If you are on Debian Buster, you can get it from [[https://backports.debian.org][buster-backports]].)
 
 ** Packages on openSUSE
 
@@ -197,4 +202,5 @@ On a machine running the openSUSE Tumbleweed distribution, install package:
 
 #+begin_example
  $ sudo zypper install bpftool
+ $ sudo zypper install tcpdump
 #+end_example

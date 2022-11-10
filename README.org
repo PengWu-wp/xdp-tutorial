@@ -1,7 +1,7 @@
 
 
 # -*- fill-column: 76; -*-
-#+TITLE: XDP Hands-On Tutorial
+#+TITLE: XDP Programming Hands-On Tutorial
 #+OPTIONS: ^:nil
 
 ** WP's note:
@@ -56,7 +56,8 @@ This tutorial aims to be a practical introduction to the different steps
 needed to successfully write useful programs using the XDP system. We assume
 you have a basic understanding of Linux networking and how to configure it
 with the =iproute2= suite of tools, but assume no prior experience with eBPF
-or XDP.
+or XDP. Prior programming experience is also helpful: the lessons are all
+written in C and they include some basic pointer arithmetic and aliasing.
 
 The tutorial is a work in progress, and was initially created for use as a
 live tutorial at the [[https://www.netdevconf.org/0x13/session.html?tutorial-XDP-hands-on][Netdev Conference]] in Prague in March 2019. Since the
@@ -99,7 +100,7 @@ eBPF program loader that you will need in subsequent lessons.
 ** Packet processing lessons
 Once you have the basics figured out and know how to load programs into the
 kernel, you are ready to start processing some packets. The lessons in the
-packet progressing category will teach you about the different steps needed
+packet processing category will teach you about the different steps needed
 to process data packets, including parsing, rewriting, instructing the
 kernel about what to do with the packet after processing, and how to use
 helpers to access existing kernel functionality.
